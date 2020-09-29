@@ -6,9 +6,9 @@ namespace TrickyBookStore.Models
 {
     public enum SubscriptionTypes
     {
-        Free = 0,
-        Paid = 1,
-        Premium = 2,
-        CategoryAddicted = 3
+        Free = 1,
+        Paid = 2,
+        Premium = 3,
+        CategoryAddicted = 0
     }
 }

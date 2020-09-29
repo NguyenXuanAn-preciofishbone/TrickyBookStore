@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using TrickyBookStore.Models;
 using TrickyBookStore.Services.Subscriptions;
 
@@ -15,7 +16,17 @@ namespace TrickyBookStore.Services.Customers
 
         public Customer GetCustomerById(long id)
         {
-            throw new NotImplementedException();
+            Customer result = new Customer();
+            var query = from customer in Store.Customers.Data
+                        where customer.Id == id
+                        select customer;
+            result = query.First();
+            return result;
+        }
+
+        public IList<Subscription> GetSubscriptions(Customer customer)
+        {
+            return SubscriptionService.GetSubscriptions(customer.SubscriptionIds);
         }
     }
 }
