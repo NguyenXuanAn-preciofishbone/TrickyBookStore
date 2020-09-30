@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TrickyBookStore.Models;
 using TrickyBookStore.Services.Subscriptions;
@@ -13,8 +14,16 @@ namespace TrickyBookStore.Services.Customers
             var query = from customer in Store.Customers.Data
                         where customer.Id == id
                         select customer;
-            result = query.First();
-            return result;
+            if (query.Any())
+            {
+                result = query.First();
+                return result;
+            }
+            else
+            {
+                Console.WriteLine("Customer not exist in database");
+                return null;
+            }
         }
     }
 }

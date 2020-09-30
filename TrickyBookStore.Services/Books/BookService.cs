@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TrickyBookStore.Models;
 
@@ -14,7 +15,15 @@ namespace TrickyBookStore.Services.Books
                 var query = from book in Store.Books.Data
                             where book.Id == transaction.Id
                             select book;
-                result.Add(query.First());
+                if (query.Any())
+                {
+                    result.Add(query.First());
+                }
+                else
+                {
+                    Console.WriteLine("Book not exist in database");
+                    return null;
+                }
             }
             return result;
         }

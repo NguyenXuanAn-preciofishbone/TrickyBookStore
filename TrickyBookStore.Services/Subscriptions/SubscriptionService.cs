@@ -27,7 +27,6 @@ namespace TrickyBookStore.Services.Subscriptions
                 result += subscription.PriceDetails["FixPrice"];
             }
             return result;
-
         }
     }
 }

@@ -14,9 +14,16 @@ namespace TrickyBookStore.Services.PurchaseTransactions
             var query = from transaction in Store.PurchaseTransactions.Data
                         where transaction.CustomerId == customerId && transaction.CreatedDate >= fromDate && transaction.CreatedDate <= toDate
                         select transaction;
-
-            result = query.ToList();
-            return result;
+            if (query.Any())
+            {
+                result = query.ToList();
+                return result;
+            }
+            else
+            {
+                Console.WriteLine("This user has no transaction");
+                return null;
+            }
         }
         public double GetTotalTransactionPrice(IList<Book> books, IList<Subscription> sortedSubscriptions)
         {
@@ -34,7 +41,6 @@ namespace TrickyBookStore.Services.PurchaseTransactions
             }
             return result;
         }
-
         internal double CalculateOldBookPrice(Book book, IList<Subscription> subscriptions)
         {
             bool isCalculated = false;
@@ -63,7 +69,6 @@ namespace TrickyBookStore.Services.PurchaseTransactions
             }
             return result;
         }
-
         internal double CalculateNewBookPrice(Book book, IList<Subscription> subscriptions)
         {
             bool isCalculated = false;
@@ -100,5 +105,4 @@ namespace TrickyBookStore.Services.PurchaseTransactions
             return result;
         }
     }
-
 }
