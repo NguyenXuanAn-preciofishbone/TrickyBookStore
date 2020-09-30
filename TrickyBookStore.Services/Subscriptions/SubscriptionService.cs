@@ -6,7 +6,7 @@ namespace TrickyBookStore.Services.Subscriptions
 {
     internal class SubscriptionService : ISubscriptionService
     {
-        public IList<Subscription> GetSubscriptions(IList<int> ids)
+        public IList<Subscription> GetSortedSubscriptions(IList<int> ids)
         {
             IList<Subscription> result = new List<Subscription>();
             foreach (int id in ids)
@@ -16,35 +16,18 @@ namespace TrickyBookStore.Services.Subscriptions
                             select subcription;
                 result.Add(query.First());
             }
-            return result;
+            IList<Subscription> sortedResult = result.OrderByDescending(c => c.Priority).ToList();   // mảng subscription có priority giảm dần
+            return sortedResult;
         }
-
-        public Subscription GetHighestPrioritySupscription(IList<Subscription> subscriptions)
+        public double GetTotalSubscriptionPrice(IList<Subscription> subscriptions)
         {
-            SubscriptionTypes highestPriority = SubscriptionTypes.Free;
-            Subscription result = new Subscription();
+            double result = 0;
             foreach (Subscription subscription in subscriptions)
             {
-                if (subscription.SubscriptionType >= highestPriority)
-                {
-                    highestPriority = subscription.SubscriptionType;
-                    result = subscription;
-                }
+                result += subscription.PriceDetails["FixPrice"];
             }
             return result;
-        }
 
-        public IList<Subscription> GetCategoryAddictedSubscriptions(IList<Subscription> subscriptions)
-        {
-            List<Subscription> result = new List<Subscription>();
-            foreach (Subscription subscription in subscriptions)
-            {
-                if (subscription.SubscriptionType == SubscriptionTypes.CategoryAddicted)
-                {
-                    result.Add(subscription);
-                }
-            }
-            return result;
         }
     }
 }

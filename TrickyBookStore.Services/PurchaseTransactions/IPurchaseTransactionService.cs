@@ -8,5 +8,6 @@ namespace TrickyBookStore.Services.PurchaseTransactions
     public interface IPurchaseTransactionService
     {
         IList<PurchaseTransaction> GetPurchaseTransactions(long customerId, DateTimeOffset fromDate, DateTimeOffset toDate);
+        double GetTotalTransactionPrice(IList<Book> books, IList<Subscription> sortedSubscriptions);
     }
 }

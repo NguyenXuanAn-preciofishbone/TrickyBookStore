@@ -29,67 +29,33 @@ namespace TrickyBookStore.Services.Payment
         public double GetPaymentAmount(long customerId, DateTimeOffset fromDate, DateTimeOffset toDate)
         {
             Customer customer = CustomerService.GetCustomerById(customerId);
-            IList<Subscription> subscriptions = CustomerService.GetSubscriptions(customer);
+            IList<Subscription> subscriptions = SubscriptionService.GetSortedSubscriptions(customer.SubscriptionIds);
 
-            Subscription highestPrioritySubscription = SubscriptionService.GetHighestPrioritySupscription(subscriptions);
-            IList<Subscription> categoryAddictedSubscriptions = SubscriptionService.GetCategoryAddictedSubscriptions(subscriptions);
+            if (subscriptions.Count == 0)
+            {
+                subscriptions.Add(new Subscription
+                {
+                    Id = 1,
+                    SubscriptionType = SubscriptionTypes.Free,
+                    Priority = 1,
+                    PriceDetails = new Dictionary<string, double>
+                {
+                    { "FixPrice", 0 },
+                    { "OldBookDiscount", 10 },
+                    { "NewBookDiscount", 0 },
+                    { "NewBookDiscountAmmount", 0 }
+                }
+                });
+            }
 
             IList<PurchaseTransaction> purchaseTransactions = PurchaseTransactionService.GetPurchaseTransactions(customerId, fromDate, toDate);
 
             IList<Book> books = BookService.GetBooks(purchaseTransactions);
 
-            double totalSubscriptionPrice = GetTotalSubscriptionPrice(highestPrioritySubscription, categoryAddictedSubscriptions);
-            double totalTransactionPrice = GetTotalTransactionPrice(books, highestPrioritySubscription, categoryAddictedSubscriptions);
+            double totalSubscriptionPrice = SubscriptionService.GetTotalSubscriptionPrice(subscriptions);
+            double totalTransactionPrice = PurchaseTransactionService.GetTotalTransactionPrice(books, subscriptions);
             return totalSubscriptionPrice + totalTransactionPrice;
         }
-
-        internal double GetTotalSubscriptionPrice(Subscription highestPrioritySubscription, IList<Subscription> categoryAddictedSubscriptions)
-        {
-            double result = 0;
-            result += highestPrioritySubscription.PriceDetails["FixPrice"];
-            foreach (Subscription categoryAddicted in categoryAddictedSubscriptions)
-            {
-                result += categoryAddicted.PriceDetails["FixPrice"];
-            }
-            return result;
-        }
-
-        internal double GetTotalTransactionPrice(IList<Book> books, Subscription highestPrioritySubscription, IList<Subscription> categoryAddictedSubscriptions)
-        {
-            double result = 0;
-
-            for (int i = 0; i < books.Count; i++)
-            {
-                bool isPriceCalculated = false;
-                for (int j = 0; j < categoryAddictedSubscriptions.Count; j++)
-                {
-                    if (books[i].CategoryId == categoryAddictedSubscriptions[j].BookCategoryId)
-                    {
-                        result += CalculatePriceWithSubscription(books[i], categoryAddictedSubscriptions[j]);
-                        isPriceCalculated = true;
-                        break;
-                    }
-                }
-                if (!isPriceCalculated)
-                {
-                    result += CalculatePriceWithSubscription(books[i], highestPrioritySubscription);
-                }
-            }
-
-            return result;
-        }
-
-        internal double CalculatePriceWithSubscription(Book book, Subscription subscription)
-        {
-            if (book.IsOld)
-            {
-                return book.Price - book.Price * subscription.PriceDetails["OldBookDiscount"] / 100;
-            }
-            else
-            {
-                return book.Price - book.Price * subscription.PriceDetails["NewBookDiscount"] / 100;
-            }
-        }
-
+        
     }
 }

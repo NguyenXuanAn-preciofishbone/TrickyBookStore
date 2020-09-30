@@ -5,8 +5,7 @@ namespace TrickyBookStore.Services.Subscriptions
 {
     public interface ISubscriptionService
     {
-        IList<Subscription> GetSubscriptions(IList<int> subscriptionIds);
-        Subscription GetHighestPrioritySupscription(IList<Subscription> subscriptions);
-        IList<Subscription> GetCategoryAddictedSubscriptions(IList<Subscription> subscriptions);
+        IList<Subscription> GetSortedSubscriptions(IList<int> subscriptionIds);
+        double GetTotalSubscriptionPrice(IList<Subscription> subscriptions);
     }
 }
